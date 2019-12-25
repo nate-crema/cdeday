@@ -4,4 +4,4 @@
 
 ## Index
 * ©2019 nate. All right reserved.
-* Management License will be deligate to CDEDAY(매일 달라지는 코디). Unathorized requst or usage will be punished based on Service License.
+* This server can use CDEDAY(매일 달라지는 코디) only. Unathorized requst or usage will be punished based on Service License.
