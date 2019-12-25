@@ -1,0 +1,34 @@
+{
+  "name": "project-cdeday",
+  "version": "1.0.0",
+  "description": "Coordinate Different Every Day - System API Server",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nate-crema/cdeday.git"
+  },
+  "keywords": [
+    "cdedy"
+  ],
+  "author": "nate",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nate-crema/cdeday/issues"
+  },
+  "homepage": "https://github.com/nate-crema/cdeday#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "fs": "0.0.1-security",
+    "ipware": "^2.0.0",
+    "mysql": "^2.17.1",
+    "path": "^0.12.7",
+    "socket.io": "^2.3.0"
+  }
+}
