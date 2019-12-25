@@ -8,6 +8,7 @@ const cors = require("cors");
 const crypto = require("crypto");
 const getIP = require("ipware")().get_ip;
 const http = require("http");
+const async = require("async");
 
 const app = express();
 
@@ -70,9 +71,11 @@ app.use((req, res, next) => {
         `
         , function(err) {
         if (err) console.log("Logging ERR:\n" + err);
-        else console.log("Accessed IP: " + ipInfo.clientIp + ", Access route: " + req.originalUrl + ", Time: " + getTime());
+        else console.log("\n" + "Accessed IP: " + ipInfo.clientIp + ", Access route: " + req.originalUrl + ", Method: " + req.method + ", Time: " + getTime() + "\n");
     })
-    next();
+    setTimeout(() => {
+        next();
+    }, 100);
 });
 
 
@@ -115,10 +118,13 @@ function mysql_query(q_comm) {
 mysql_query("show tables")
 .then((res) => {
     if (res.length != 0) {
-        console.log("Connected to Mysql DB");
+        console.log("Connected to Mysql DB. Total table number is " + res.length);
     }
+})
+.catch((err) => {
+    console.log(err);
 })
 
 
 // router
-const router = require("./router") (app, fs, path, crypto, getIP, mysql, mysql_query);
+const router = require("./router") (app, fs, path, crypto, async, getIP, getTime, mysql_query);
