@@ -59,6 +59,12 @@ function getTime() {
     return '' + new Date().getFullYear() + month + date + "-" + hour + ":" + minute + ":" + second;
 }
 
+
+
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
+
 // log accessed ip
 
 app.use((req, res, next) => {
@@ -67,7 +73,9 @@ app.use((req, res, next) => {
         `
         time: ` + getTime() + `,
         ip: ` + ipInfo.clientIp + `,
-        router: ` + req.originalUrl + `
+        router: ` + req.originalUrl + `,
+        header: ` + JSON.stringify(req.headers) + `,
+        body: ` + JSON.stringify(req.body) + `
         `
         , function(err) {
         if (err) console.log("Logging ERR:\n" + err);
@@ -77,10 +85,6 @@ app.use((req, res, next) => {
         next();
     }, 100);
 });
-
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
 
 // session setting
 app.use(session({

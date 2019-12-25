@@ -5,18 +5,34 @@ module.exports = (app, fs, path, crypto, async, getIP, getTime, mysql_query) => 
     // });
 
 
+
+    const server_mode = "development";
+
+
     // response function
 
     function res_end(res, code, err, err_position, cont) {
-        res.json({
-            status: code,
-            contents: cont,
-            error: {
-                position: err_position,
+        if (server_mode == "development") {
+            res.json({
+                status: code,
+                contents: cont,
+                error: {
+                    position: err_position,
+                    errors: err
+                }
+            });
+        } else if (server_mode == "service") {
+            res.json({
+                status: code,
+                contents: cont,
                 errors: err
-            }
-        });
+            });
+        }
     }
+
+
+
+    // Authorizing
 
 
 
@@ -115,6 +131,50 @@ module.exports = (app, fs, path, crypto, async, getIP, getTime, mysql_query) => 
         // update
 
         // read
+
+        app.get('/reserv', (req, res) => {
+            const rule = req.body.rule;
+
+            var scomm = "";
+
+            // filtering rules
+                if (rule.id) {
+                    scomm += ' AND id="'+rule.id+'"'
+                }
+                if (rule.userid) {
+                    scomm += ' AND userid="'+rule.userid+'"'
+                }
+                if (rule.status) {
+                    scomm += ' AND id="'+rule.status+'"'
+                }
+                if (rule.designerid) {
+                    scomm += ' AND id="'+rule.designerid+'"'
+                }
+                if (rule.date) {
+                    scomm += ' AND id="'+rule.date+'"'
+                }
+                if (rule.time) {
+                    scomm += ' AND id="'+rule.time+'"'
+                }
+                if (rule.note) {
+                    scomm += ' AND id="'+rule.note+'"'
+                }
+            // filtering rules
+
+            scomm = scomm.replace(" AND", "");
+
+            // console.log(scomm);
+
+            mysql_query("SELECT * FROM reserv WHERE" + scomm)
+            .then((res_sql) => {
+                // console.log(res_sql);
+                res_end(res, 200, undefined, undefined, res_sql);
+            })
+            .catch((err) => {
+                // console.log(err);
+                res_end(res, 403, err, "Search from DB", undefined);
+            })
+        })
 
         // delete
 
