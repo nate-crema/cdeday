@@ -12,6 +12,8 @@ const async = require("async");
 const multer = require("multer");
 const utf8 = require("utf8");
 const iconv = require("iconv-lite");
+const mime = require("mime");
+const mimeTypes = require("mime-types");
 
 const app = express();
 
@@ -148,4 +150,4 @@ function makeid(length) {
 
 
 // router
-const router = require("./router") (app, fs, path, crypto, multer, async, getIP, utf8, iconv, getTime, makeid, mysql_query);
+const router = require("./router") (app, fs, path, crypto, multer, async, getIP, utf8, iconv, mime, mimeTypes, getTime, makeid, mysql_query);
