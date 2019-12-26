@@ -129,7 +129,7 @@ module.exports = (app, fs, path, crypto, multer, async, getIP, utf8, iconv, mime
                     mysql_query(command)
                     .then((res_sql) => {
                         console.log(res_sql);
-                        res_end(res, 200, undefined, undefined, "complete");
+                        res_end(res, 200, undefined, undefined, "true");
                     })
                     .catch((err) => {
                         console.log("ERR" + err);
@@ -419,13 +419,105 @@ module.exports = (app, fs, path, crypto, multer, async, getIP, utf8, iconv, mime
         })
     })
 
-    // delete
-
     
     // user function
         // create
+        app.post('/user', (req, res) => {
+            const userid = req.body.userid;
+            const pw = req.body.pw;
+            const type = req.body.type; // format: int(1) || 0: finance manager, 1: user, 2: designer, 3: system manager, 4: Administrator, 5: test account
+            const name = req.body.name;
+            const pn = req.body.pn;
+            const email = req.body.email;
+            const birth = req.body.birth;
+
+            if (!userid || !pw || !type || !name || !pn || !email || !birth) {
+                res_end(res, 400, "Some of Information Expected, but missed.", "Checking input data", undefined);
+            } else {
+                async.waterfall([
+                    function(callback) {
+                        // userid duplication check
+                        mysql_query("SELECT * FROM user WHERE userid='" + userid + "'")
+                        .then((res_sql) => {
+                            if (res_sql.length != 0) {
+                                res_end(res, 409, "ERR: Duplicate userid", "userid duplication check", undefined);
+                            } else {
+                                callback(null);
+                            }
+                        })
+                        .catch((e) => {
+                            console.log(e);
+                            res_end(res, 400, e, "userid duplication check", undefined);
+                        })
+                    },
+                    function(callback) {
+                        // password encrypt
+
+                        crypto.randomBytes(64, (err, buf) => {
+                            crypto.pbkdf2(pw, buf.toString('base64'), 150000, 70, 'sha512', (err, key) => {
+                                // console.log(key.toString('base64')); 
+                                // console.log(key.toString('base64').length);
+                                // console.log(buf.toString('base64').length);
+                                callback(null, key.toString('base64'), buf.toString('base64'));
+                            });
+                        });
+                    },
+                    function(pw_enc, salt, callback) {
+                        // register user
+                        mysql_query("INSERT INTO user (userid, pw, type, name, pn, email, birth, salt) VALUES ('" + userid + "', '" + pw_enc + "', " + type + ", '" + name + "', '" + pn + "', '" + email + "', '" + birth + "', '" + salt + "');")
+                        .then((res_sql) => {
+                            console.log(res_sql);
+                            res_end(res, 200, undefined, undefined, "true");
+                        })
+                        .catch((e) => {
+                            res_end(res, 400, e, "register user", undefined);
+                        })
+                    }
+                ])
+            }
+
+            // res.end();
+        })
 
         // update
+        app.patch('/user', (req, res) => {
+            const base = req.body.base; // format: JSON
+            const cobj = req.body.data; // format: JSON
+
+            var ucomm = "";
+
+            // filtering rules
+                if (cobj.userid) {
+                    ucomm += ', id="'+cobj.userid+'"'
+                }
+                if (cobj.name) {
+                    ucomm += ', userid="'+cobj.name+'"'
+                }
+                if (cobj.type) {
+                    ucomm += ', status="'+cobj.type+'"'
+                }
+                if (cobj.pn) {
+                    ucomm += ', designerid="'+cobj.pn+'"'
+                }
+                if (cobj.email) {
+                    ucomm += ', date="'+cobj.email+'"'
+                }
+            // filtering rules
+
+            ucomm = ucomm.replace(",", "");
+
+            const cbase = Object.keys(base)[0];
+            mysql_query("UPDATE user SET" + ucomm + " WHERE " + cbase + "='" + base[cbase] + "'")
+            .then((res_sql) => {
+                // console.log(res_sql);
+                res_end(res, 200, undefined, undefined, res_sql);
+            })
+            .catch((err) => {
+                // console.log(err);
+                res_end(res, 403, err, "Search from DB", undefined);
+            })
+        })
+        
 
         // read
 

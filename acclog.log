@@ -4191,3 +4191,99 @@
         header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"a75c2a48-3271-4ed8-a3b1-9bc31c94ceb1","host":"localhost","accept-encoding":"gzip, deflate","content-length":"102","cookie":"CDEDAY-key=s%3A_k1rDFQnZJgam-Z-5Vi7_lFDfnGPz84R.NGjhBDMR6QLpAE6okce8Y9Y3gelIja3fyptGYDXf3bo","connection":"keep-alive"},
         body: {"photoid":"seHK/Y2sp3N2m1HI/THjb+BZaYufUThjQB/h7fDnDovdu1wPOgtylra1rjoZOz9dJnvwNDyMkJI8ftfpTKoHMw"}
         
+        time: 20191227-00:54:08,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"b0b25660-956c-4d49-8e99-93e80cdc9d1d","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3A8Qh7_3d4oWHwl-x8VGD0VWpBTNEEU1W7.aVSSIY%2BCKvN%2FU1OOB4O4yoCJVr3EkJztKyzSscXqCdM","connection":"keep-alive"},
+        body: {"userid":"nate2402","pw":"English4576*","type":"1","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:00:55,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"151d5c77-4cfe-4a99-85ed-5d139a01d6fd","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3AmgA7ECDcULSUDrL8BHS4DSbdPJv789bF.RGsAUMTrZaG%2B3i1dw48tizb8ZdoIkrHyzzvAaz6B2jQ","connection":"keep-alive"},
+        body: {"userid":"nate2402","pw":"English4576*","type":"1","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:01:04,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"e9415a20-3fc4-4a0e-879b-ce01fc4b2f06","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3AFdy-vc7j5b_0y4ISQS-cDeT8o_EaMUP4.y00qkezJUP%2B3WNsL3iWAFAnRFvCQKKILKFXfF%2FEQZ%2Fs","connection":"keep-alive"},
+        body: {"userid":"nate2402","pw":"English4576*","type":"1","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:01:26,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"a7f0ea6f-06cb-4e2d-a5cf-ecef6c46b31d","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3AH3LimdVf1Jyq_2C5kbaxwTRHuxHlf4W1.DEBfiB2RgEhv3p%2BxpyfuEZt9aAxj5776p9tawboO4zA","connection":"keep-alive"},
+        body: {"userid":"nate2403","pw":"English4576*","type":"1","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:01:44,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"e767909e-a438-4e55-8f6f-9133713b5199","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3AH3LimdVf1Jyq_2C5kbaxwTRHuxHlf4W1.DEBfiB2RgEhv3p%2BxpyfuEZt9aAxj5776p9tawboO4zA","connection":"keep-alive"},
+        body: {"userid":"nate2403","pw":"English4576*","type":"1","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:13:40,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"8357720c-2150-4b94-84e8-6ccbbfadf0f5","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3AsdNnfIX_CIN5jgOA9aXomSJeDM7qfLSI.Nkdwn5PlizhfT%2FZHGSRQuOKry6iqcG8pD1dqoM1ECpQ","connection":"keep-alive"},
+        body: {"userid":"nate2402","pw":"English4576*","type":"1","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:13:58,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"b28ead64-5d06-4dbc-8357-a91f4933ff65","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3AIPNfs5pXXzfq39q7tTAK-k-mt7qBeO8c.M%2FqvrvB87ibsK22WXws23aJiu%2F%2FXI%2BFt41d3b63lQ8I","connection":"keep-alive"},
+        body: {"userid":"nate2402","pw":"English4576*","type":"1","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:14:28,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"0afc07c9-6aae-42fb-8718-e59cad8590bb","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3AIPkyAqcTapj7a1LkSBTaiIBgidZnHwtc.9fnZ5mACzGejh6h91uf3hUEypelt8EbRvW8RS0vryqQ","connection":"keep-alive"},
+        body: {"userid":"nate2402","pw":"English4576*","type":"1","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:14:36,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"de7c76dc-8080-4dc2-b233-90c981c13d53","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3ABJeKZhSfeztulo7Oz3qSem0LHaWwk2D-.Wig7L0seLSkCIKCyqUOOCjugvY1uWr08Y4EEt6QhPCE","connection":"keep-alive"},
+        body: {"userid":"nate2402","pw":"English4576*","type":"1","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:15:04,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"e7d6ec44-3d26-4165-b630-16c49e858eba","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3AoQWdWNZ5H2tVvcwQvtvF_h0GRv9zOry7.Z15H5DFzAguqlkKhWaKw9FmKELqlJjZOlUB3LaZlNqA","connection":"keep-alive"},
+        body: {"userid":"nate2402","pw":"English4576*","type":"1","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:15:51,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"45905c33-0a61-4c7f-a986-1beba29bed95","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3ArRNbFopYQ7z2XGEvu14lGKXYBxelB5e1.cM61kUW%2FDcLBGl1GGMlO0h0zFhjVMqrDO%2FJhb7qitzw","connection":"keep-alive"},
+        body: {"userid":"nate2402","pw":"English4576*","type":"1","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:16:26,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"655cafa4-a3f3-4dca-83c7-81b07f78ee90","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3ArRNbFopYQ7z2XGEvu14lGKXYBxelB5e1.cM61kUW%2FDcLBGl1GGMlO0h0zFhjVMqrDO%2FJhb7qitzw","connection":"keep-alive"},
+        body: {"userid":"nate2402","pw":"English4576*","type":"1","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:16:29,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"9804bfa6-6878-494e-b818-7035aceda8f2","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3AqxZu6WYSR-zIFNR2fenTeXgBE0_Hw6CU.4ziPgr0i5jeW3ZKXFAQBKqsUW10B4Ph2nKj4R8diLxs","connection":"keep-alive"},
+        body: {"userid":"nate2403","pw":"English4576*","type":"1","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:18:24,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"fb131e16-89b8-4d31-8e1b-37f6a4e62d0a","host":"localhost","accept-encoding":"gzip, deflate","content-length":"103","cookie":"CDEDAY-key=s%3AqxZu6WYSR-zIFNR2fenTeXgBE0_Hw6CU.4ziPgr0i5jeW3ZKXFAQBKqsUW10B4Ph2nKj4R8diLxs","connection":"keep-alive"},
+        body: {"userid":"nate2403","pw":"English4576*","type":"1","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:18:31,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"82e37d4e-d7dd-46de-922e-7f461154a7e3","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3Ap5BXMOHvKVKyLo-Ew-qrTGQ1BDGBGSx_.YtgI2WxHF5%2FbeV1gKyyUnwNBseVblyox5BYtrGFcWrQ","connection":"keep-alive"},
+        body: {"userid":"nate2403","pw":"English4576*","type":"1","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
+        time: 20191227-01:20:16,
+        ip: ::1,
+        router: /user,
+        header: {"content-type":"application/x-www-form-urlencoded","user-agent":"PostmanRuntime/7.21.0","accept":"*/*","cache-control":"no-cache","postman-token":"0457483e-0dcc-448e-b6c7-c47e103872a2","host":"localhost","accept-encoding":"gzip, deflate","content-length":"136","cookie":"CDEDAY-key=s%3Ap5BXMOHvKVKyLo-Ew-qrTGQ1BDGBGSx_.YtgI2WxHF5%2FbeV1gKyyUnwNBseVblyox5BYtrGFcWrQ","connection":"keep-alive"},
+        body: {"userid":"nate2404","pw":"English4576*","type":"5","name":"김화균","pn":"+821052720204","email":"nate2402@naver.com","birth":"2002.11.27"}
+        
