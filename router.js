@@ -130,42 +130,40 @@ module.exports = (app, fs, path, crypto, async, getIP, getTime, mysql_query) => 
 
         // update
 
-        // read
+        app.patch('/reserv', (req, res) => {
+            const base = req.body.base; // format: JSON
+            const cobj = req.body.data; // format: JSON
 
-        app.get('/reserv', (req, res) => {
-            const rule = req.body.rule;
-
-            var scomm = "";
+            var ucomm = "";
 
             // filtering rules
-                if (rule.id) {
-                    scomm += ' AND id="'+rule.id+'"'
+                if (cobj.id) {
+                    ucomm += ', id="'+cobj.id+'"'
                 }
-                if (rule.userid) {
-                    scomm += ' AND userid="'+rule.userid+'"'
+                if (cobj.userid) {
+                    ucomm += ', userid="'+cobj.userid+'"'
                 }
-                if (rule.status) {
-                    scomm += ' AND id="'+rule.status+'"'
+                if (cobj.status) {
+                    ucomm += ', status="'+cobj.status+'"'
                 }
-                if (rule.designerid) {
-                    scomm += ' AND id="'+rule.designerid+'"'
+                if (cobj.designerid) {
+                    ucomm += ', designerid="'+cobj.designerid+'"'
                 }
-                if (rule.date) {
-                    scomm += ' AND id="'+rule.date+'"'
+                if (cobj.date) {
+                    ucomm += ', date="'+cobj.date+'"'
                 }
-                if (rule.time) {
-                    scomm += ' AND id="'+rule.time+'"'
+                if (cobj.time) {
+                    ucomm += ', time="'+cobj.time+'"'
                 }
-                if (rule.note) {
-                    scomm += ' AND id="'+rule.note+'"'
+                if (cobj.note) {
+                    ucomm += ', note="'+cobj.note+'"'
                 }
             // filtering rules
 
-            scomm = scomm.replace(" AND", "");
+            ucomm = ucomm.replace(",", "");
 
-            // console.log(scomm);
-
-            mysql_query("SELECT * FROM reserv WHERE" + scomm)
+            const cbase = Object.keys(base)[0];
+            mysql_query("UPDATE reserv SET" + ucomm + " WHERE " + cbase + "='" + base[cbase] + "'")
             .then((res_sql) => {
                 // console.log(res_sql);
                 res_end(res, 200, undefined, undefined, res_sql);
@@ -174,6 +172,61 @@ module.exports = (app, fs, path, crypto, async, getIP, getTime, mysql_query) => 
                 // console.log(err);
                 res_end(res, 403, err, "Search from DB", undefined);
             })
+
+        })
+
+        // read
+
+        app.get('/reserv', (req, res) => {
+            const rule = req.body.rule; // format: String or JSON
+
+            var scomm = "";
+
+            // filtering rules
+            if (rule != undefined) {
+                if (rule != "all") {
+                    if (rule.id) {
+                        scomm += ' AND id="'+rule.id+'"'
+                    }
+                    if (rule.userid) {
+                        scomm += ' AND userid="'+rule.userid+'"'
+                    }
+                    if (rule.status) {
+                        scomm += ' AND status="'+rule.status+'"'
+                    }
+                    if (rule.designerid) {
+                        scomm += ' AND designerid="'+rule.designerid+'"'
+                    }
+                    if (rule.date) {
+                        scomm += ' AND date="'+rule.date+'"'
+                    }
+                    if (rule.time) {
+                        scomm += ' AND time="'+rule.time+'"'
+                    }
+                    if (rule.note) {
+                        scomm += ' AND note="'+rule.note+'"'
+                    }
+                }
+                
+
+                // filtering rules
+
+                scomm = scomm.replace(" AND", " WHERE");
+
+                // console.log(scomm);
+
+                mysql_query("SELECT * FROM reserv" + scomm)
+                .then((res_sql) => {
+                    // console.log(res_sql);
+                    res_end(res, 200, undefined, undefined, res_sql);
+                })
+                .catch((err) => {
+                    // console.log(err);
+                    res_end(res, 403, err, "Search from DB", undefined);
+                })
+            } else {
+                res_end(res, 400, "Cannot find key 'rule'", "Filtering Convertion", undefined);
+            }
         })
 
         // delete
