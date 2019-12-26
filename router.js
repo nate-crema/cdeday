@@ -1,4 +1,4 @@
-module.exports = (app, fs, path, crypto, async, getIP, getTime, mysql_query) => {
+module.exports = (app, fs, path, crypto, multer, async, getIP, utf8, iconv, getTime, makeid, mysql_query) => {
     // test router
     // app.post('/', (req, res) => {
     //     res.end("true");
@@ -234,6 +234,78 @@ module.exports = (app, fs, path, crypto, async, getIP, getTime, mysql_query) => 
 
 
     // photo upload function
+
+    const upload = multer ({
+        storage: multer.diskStorage({
+            destination: (req, file, cb) => {
+                cb(null, path.join(__dirname, '/photo/tmp'))
+            },
+            filename: (req, file, cb) => {
+                cb(null, file.fieldname + "-" + Date.now())
+            }
+        })
+    })
+
+
+    // upload
+    app.post('/photo', upload.any(), (req, res) => {
+        const files = req.files[0];
+        const uploader = req.body.userid;
+        const uploadtime = getTime();
+        if (req.files.length > 1) {
+            res_end(res, 413, "ERR: CANNOT UPLOAD MULTIPLE FILES AT ONCE", "check file number", undefined);
+        } else {
+            async.waterfall([
+                function(callback) {
+                    console.log(files);
+
+                    // create photoid
+
+                    const random_fdigit = makeid(5);
+
+                    var photoid = uploadtime + "%#$" + random_fdigit + "uid" + uploader;
+                    photoid = crypto.createHash('sha512').update(photoid).digest('base64').replace("==", "");
+                    console.log(photoid);
+                    
+                    // create filename
+
+                    const fileTmpDir = files.destination;
+                    const fileTmpSaved = files.path;
+                    const fileTmpName = files.filename;
+                    const filename_split = files.originalname.split(".");
+                    const fileExt = filename_split[filename_split.length-1];
+                    const fileOriginName = filename_split.replace(fileExt, "");
+                    
+
+                    const fileSaveName = crypto.createHash('sha512').update(fileOriginName).digest('base64');
+
+                    // move file to user folder
+
+                    const newSaveDir = path.join(__dirname, "/photo/" + uploader);
+
+                    if (!fs.existSync(newSaveDir)) {
+                        fs.mkdirSync(newSaveDir);
+                    }
+
+                    fs.rename(fileTmpSaved, path.join(newSaveDir, fileSaveName));
+
+                    res.end();
+                }
+            ])
+        }
+    })
+    
+
+    // download
+    app.get('/photo', (req, res) => {
+        const file = req.body.filename;
+        
+        
+    })
+
+    // list
+
+    // delete
 
     
     // user function
