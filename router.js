@@ -572,27 +572,66 @@ module.exports = (app, fs, path, crypto, multer, async, getIP, utf8, iconv, mime
             var ucomm = "";
 
             // filtering rules
+                if (cobj.id) {
+                    ucomm += ', id="'+cobj.id+'"'
+                }
                 if (cobj.userid) {
-                    ucomm += ', id="'+cobj.userid+'"'
+                    ucomm += ', userid="'+cobj.userid+'"'
                 }
-                if (cobj.name) {
-                    ucomm += ', userid="'+cobj.name+'"'
+                if (cobj.status) {
+                    ucomm += ', status="'+cobj.status+'"'
                 }
-                if (cobj.type) {
-                    ucomm += ', status="'+cobj.type+'"'
+                if (cobj.designerid) {
+                    ucomm += ', designerid="'+cobj.designerid+'"'
                 }
-                if (cobj.pn) {
-                    ucomm += ', designerid="'+cobj.pn+'"'
+                if (cobj.date) {
+                    ucomm += ', date="'+cobj.date+'"'
                 }
-                if (cobj.email) {
-                    ucomm += ', date="'+cobj.email+'"'
+                if (cobj.time) {
+                    ucomm += ', time="'+cobj.time+'"'
+                }
+                if (cobj.note) {
+                    ucomm += ', note="'+cobj.note+'"'
                 }
             // filtering rules
 
+            var scomm = "";
+
+            // filtering bases
+            if (base != undefined) {
+                if (base != "all") {
+                    if (base.id) {
+                        scomm += ' AND id="'+base.id+'"'
+                    }
+                    if (base.userid) {
+                        scomm += ' AND userid="'+base.userid+'"'
+                    }
+                    if (base.status) {
+                        scomm += ' AND status="'+base.status+'"'
+                    }
+                    if (base.designerid) {
+                        scomm += ' AND designerid="'+base.designerid+'"'
+                    }
+                    if (base.date) {
+                        scomm += ' AND date="'+base.date+'"'
+                    }
+                    if (base.time) {
+                        scomm += ' AND time="'+base.time+'"'
+                    }
+                    if (base.note) {
+                        scomm += ' AND note="'+base.note+'"'
+                    }
+                }
+            }
+            
+
+            // filtering bases
+
             ucomm = ucomm.replace(",", "");
+            scomm = scomm.replace(" AND", " WHERE");
 
             const cbase = Object.keys(base)[0];
-            mysql_query("UPDATE user SET" + ucomm + " WHERE " + cbase + "='" + base[cbase] + "'")
+            mysql_query("UPDATE user SET" + ucomm + scomm)
             .then((res_sql) => {
                 // console.log(res_sql);
                 res_end(res, 200, undefined, undefined, res_sql);
