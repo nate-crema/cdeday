@@ -1,4 +1,4 @@
-module.exports = (app, fs, path, crypto, multer, async, getIP, getTime, mysql_query) => {
+module.exports = (app, fs, path, crypto, multer, async, getIP, utf8, iconv, mime, mimeTypes, getTime, makeid, mysql_query) => {
     // test router
     // app.post('/', (req, res) => {
     //     res.end("true");
@@ -11,22 +11,34 @@ module.exports = (app, fs, path, crypto, multer, async, getIP, getTime, mysql_qu
 
     // response function
 
-    function res_end(res, code, err, err_position, cont) {
-        if (server_mode == "development") {
+    function res_end(res, code, err, err_position, cont, note) {
+        if (note && server_mode == "development") {
             res.json({
                 status: code,
                 contents: cont,
                 error: {
                     position: err_position,
-                    errors: err
+                    errors: err,
+                    note: note
                 }
             });
-        } else if (server_mode == "service") {
-            res.json({
-                status: code,
-                contents: cont,
-                errors: err
-            });
+        } else {
+            if (server_mode == "development") {
+                res.json({
+                    status: code,
+                    contents: cont,
+                    error: {
+                        position: err_position,
+                        errors: err
+                    }
+                });
+            } else if (server_mode == "service") {
+                res.json({
+                    status: code,
+                    contents: cont,
+                    errors: err
+                });
+            }
         }
     }
 
@@ -117,7 +129,7 @@ module.exports = (app, fs, path, crypto, multer, async, getIP, getTime, mysql_qu
                     mysql_query(command)
                     .then((res_sql) => {
                         console.log(res_sql);
-                        res_end(res, 200, undefined, undefined, "complete");
+                        res_end(res, 200, undefined, undefined, "true");
                     })
                     .catch((err) => {
                         console.log("ERR" + err);
@@ -319,27 +331,278 @@ module.exports = (app, fs, path, crypto, multer, async, getIP, getTime, mysql_qu
 
 
     // photo upload function
+  
+    const upload = multer ({
+        storage: multer.diskStorage({
+            destination: (req, file, cb) => {
+                cb(null, path.join(__dirname, '/photo/tmp'))
+            },
+            filename: (req, file, cb) => {
+                const baseFileName = file.fieldname + "-" + Date.now();
 
-        const upload = multer({
-            dest: '/photo/temp'
-        });
+                function check_file(baseFileName) {
+                    if (fs.existsSync(baseFileName)) return check_file(baseFileName+"(1)");
+                    else return cb(null, baseFileName);
+                }
 
-        // upload
-        app.post('/photo', upload.single(), (req, res) => {
-            console.log(req.file);
-
-            res.end();
+                check_file(baseFileName);
+            }
         })
+    })
 
-        // download
 
-        // delete
+    // upload
+    app.post('/photo_u', upload.any(), (req, res) => {
+        const files = req.files[0];
+        const uploader = req.body.userid;
+        const uploadtime = getTime();
+
+        
+        // res.end();
+        
+        if (req.files.length > 1) {
+            res_end(res, 413, "ERR: CANNOT UPLOAD MULTIPLE FILES AT ONCE", "check file number", undefined);
+        } else {
+            async.waterfall([
+                function(callback) {
+                    console.log(files);
+
+                    // create photoid
+
+                    const random_fdigit = makeid(5);
+
+                    var photoid = uploadtime + "%#$" + random_fdigit + "uid" + uploader + Date.now();
+                    photoid = crypto.createHash('sha512').update(photoid).digest('base64').replace("==", "");
+                    console.log(photoid);
+                    
+                    // create filename
+
+                    const fileTmpDir = files.destination;
+                    const fileTmpSaved = files.path;
+                    const fileTmpName = files.filename;
+                    const filename_split = files.originalname.split(".");
+                    const fileExt = filename_split[filename_split.length-1];
+                    const fileOriginName = files.originalname.replace(fileExt, "").replace(".","");
+                    
+
+                    // const fileSaveName = crypto.createHash('sha512').update(fileOriginName).digest('base64');
+
+
+                    const cipher_fsN = crypto.createCipher('aes-256-cbc', photoid);
+                    let fileSaveName = cipher_fsN.update(fileOriginName, 'utf8', 'base64');
+                    fileSaveName += cipher_fsN.final('base64');
+
+
+                    // remove '/' because of route error possibility
+
+                    while (true) {
+                        var before = fileSaveName;
+                        fileSaveName = before.replace("/","");
+                        if (before == fileSaveName) break;
+                    }
+
+                    // move file to user folder
+
+                    const newSaveDir = path.join(__dirname, "/photo/" + uploader);
+
+                    
+                    if (!fs.existsSync(newSaveDir)) {
+                        fs.mkdirSync(newSaveDir);
+                    }
+
+                    console.log(fs.existsSync(fileTmpSaved));
+                    console.log(fs.existsSync(path.join(newSaveDir, fileSaveName)));
+                    console.log(fs.existsSync(newSaveDir));
+
+                    fs.rename(fileTmpSaved, path.join(newSaveDir, fileSaveName), (err) => {
+                        if (err) res_end(res, 400, err, "move tmp to psersonal", undefined);
+                        else {
+                            callback(null, {
+                                ext: fileExt,
+                                route: newSaveDir,
+                                savename: fileSaveName,
+                                originalname: fileOriginName
+                            }, photoid, uploadtime, uploader);
+                        }
+                    });
+
+                    // res.end();
+                },
+                function(fileinfo, photoid, time, uploader, callback) {
+                    // duplicate uplodaed file check
+
+                    mysql_query("SELECT * FROM photo WHERE savedname='" + fileinfo.savename + "'")
+                    .then((res_sql) => {
+                        console.log(res_sql);
+                        if (res_sql.length > 0) {
+                            res_end(res, 403, "ERR: Already uploaded file", "check file duplication", undefined); 
+                        } else {
+                            callback(null, fileinfo, photoid, time, uploader);
+                        }
+                    })
+                },
+                function(fileinfo, photoid, time, uploader, callback) {
+                    // save info in DB
+
+                    const command = "INSERT INTO photo (photoid, filename, ext, savedname, date, time, uploader, ip) VALUES('" + photoid + "', '" + fileinfo.originalname + "', '" + fileinfo.ext + "', '" + fileinfo.savename + "', '" + time.split("-")[0] + "', '" + time.split("-")[1] + "', '" +  uploader + "', '" + getIP(req).clientIp + "');";
+                    // console.log(command);
+                    mysql_query(command)
+                    .then((res_sql) => {
+                        console.log(res_sql);
+                        // res.end();
+                        res_end(res, 200, undefined, undefined, "true");
+                    })
+                    .catch((e) => {
+                        // console.log(e);
+                        res_end(res, 403, e, "writing info - DB", undefined, command);
+                    })
+                }
+            ])
+        }
+    })
+    
+
+    // download
+    app.post('/photo_d', (req, res) => {
+        const photoid = req.body.photoid;
+
+        if (!photoid) res_end(res, 400, "Cannot find key 'photoid'", "check photoid", undefined);
+        else {
+            mysql_query("SELECT * FROM photo WHERE photoid='" + photoid + "'")
+            .then((res_sql) => {
+                if (res_sql.length == 0) res_end(res, 404, "FILE NOT FOUND", "query request", undefined);
+                else if (res_sql.length > 1) res_end(res, 413, "batchSizeTooLarge", "query request", undefined, "server error: contact manager");
+                else {
+                    const savedfile = res_sql[0];
+                    const fileName = savedfile.filename;
+                    const savedFileRoute = path.join(__dirname, "/photo/" + savedfile.uploader, savedfile.savedname);
+                    const mimetype = mimeTypes.lookup(savedFileRoute + "." + savedfile.ext);
+                    res.setHeader('Content-disposition', 'attachment; filename=' + fileName);
+                    res.setHeader('Content-type', mimetype);
+                    fs.createReadStream(savedFileRoute).pipe(res);
+                }
+            })
+            .catch((e) => {
+                console.log(e);
+                res_end(res, 400, e, "query request", undefined);
+            })
+        }
+    })
+
+    // list
+    app.get('/photo_l', (req, res) => {
+        const photoid = req.body.photoid;
+
+        if (!photoid) res_end(res, 400, "Cannot find key 'photoid'", "check photoid", undefined);
+        
+        mysql_query("SELECT * FROM photo WHERE photoid='" + photoid + "'")
+        .then((res_sql) => {
+            res_end(res, 200, undefined, undefined, res_sql);
+        })
+        .catch((e) => {
+            res_end(res, 400, e, "query request", undefined);
+        })
+    })
 
     
     // user function
         // create
+        app.post('/user', (req, res) => {
+            const userid = req.body.userid;
+            const pw = req.body.pw;
+            const type = req.body.type; // format: int(1) || 0: finance manager, 1: user, 2: designer, 3: system manager, 4: Administrator, 5: test account
+            const name = req.body.name;
+            const pn = req.body.pn;
+            const email = req.body.email;
+            const birth = req.body.birth;
+
+            if (!userid || !pw || !type || !name || !pn || !email || !birth) {
+                res_end(res, 400, "Some of Information Expected, but missed.", "Checking input data", undefined);
+            } else {
+                async.waterfall([
+                    function(callback) {
+                        // userid duplication check
+                        mysql_query("SELECT * FROM user WHERE userid='" + userid + "'")
+                        .then((res_sql) => {
+                            if (res_sql.length != 0) {
+                                res_end(res, 409, "ERR: Duplicate userid", "userid duplication check", undefined);
+                            } else {
+                                callback(null);
+                            }
+                        })
+                        .catch((e) => {
+                            console.log(e);
+                            res_end(res, 400, e, "userid duplication check", undefined);
+                        })
+                    },
+                    function(callback) {
+                        // password encrypt
+
+                        crypto.randomBytes(64, (err, buf) => {
+                            crypto.pbkdf2(pw, buf.toString('base64'), 150000, 70, 'sha512', (err, key) => {
+                                // console.log(key.toString('base64')); 
+                                // console.log(key.toString('base64').length);
+                                // console.log(buf.toString('base64').length);
+                                callback(null, key.toString('base64'), buf.toString('base64'));
+                            });
+                        });
+                    },
+                    function(pw_enc, salt, callback) {
+                        // register user
+                        mysql_query("INSERT INTO user (userid, pw, type, name, pn, email, birth, salt) VALUES ('" + userid + "', '" + pw_enc + "', " + type + ", '" + name + "', '" + pn + "', '" + email + "', '" + birth + "', '" + salt + "');")
+                        .then((res_sql) => {
+                            console.log(res_sql);
+                            res_end(res, 200, undefined, undefined, "true");
+                        })
+                        .catch((e) => {
+                            res_end(res, 400, e, "register user", undefined);
+                        })
+                    }
+                ])
+            }
+
+            // res.end();
+        })
 
         // update
+        app.patch('/user', (req, res) => {
+            const base = req.body.base; // format: JSON
+            const cobj = req.body.data; // format: JSON
+
+            var ucomm = "";
+
+            // filtering rules
+                if (cobj.userid) {
+                    ucomm += ', id="'+cobj.userid+'"'
+                }
+                if (cobj.name) {
+                    ucomm += ', userid="'+cobj.name+'"'
+                }
+                if (cobj.type) {
+                    ucomm += ', status="'+cobj.type+'"'
+                }
+                if (cobj.pn) {
+                    ucomm += ', designerid="'+cobj.pn+'"'
+                }
+                if (cobj.email) {
+                    ucomm += ', date="'+cobj.email+'"'
+                }
+            // filtering rules
+
+            ucomm = ucomm.replace(",", "");
+
+            const cbase = Object.keys(base)[0];
+            mysql_query("UPDATE user SET" + ucomm + " WHERE " + cbase + "='" + base[cbase] + "'")
+            .then((res_sql) => {
+                // console.log(res_sql);
+                res_end(res, 200, undefined, undefined, res_sql);
+            })
+            .catch((err) => {
+                // console.log(err);
+                res_end(res, 403, err, "Search from DB", undefined);
+            })
+        })
+        
 
         // read
 

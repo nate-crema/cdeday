@@ -10,6 +10,10 @@ const getIP = require("ipware")().get_ip;
 const http = require("http");
 const async = require("async");
 const multer = require("multer");
+const utf8 = require("utf8");
+const iconv = require("iconv-lite");
+const mime = require("mime");
+const mimeTypes = require("mime-types");
 
 const app = express();
 
@@ -131,5 +135,19 @@ mysql_query("show tables")
 })
 
 
+// random string
+
+function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+
+
+
 // router
-const router = require("./router") (app, fs, path, crypto, multer, async, getIP, getTime, mysql_query);
+const router = require("./router") (app, fs, path, crypto, multer, async, getIP, utf8, iconv, mime, mimeTypes, getTime, makeid, mysql_query);
