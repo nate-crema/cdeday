@@ -1,4 +1,4 @@
-module.exports = (app, fs, path, crypto, async, getIP, getTime, mysql_query) => {
+module.exports = (app, fs, path, crypto, multer, async, getIP, getTime, mysql_query) => {
     // test router
     // app.post('/', (req, res) => {
     //     res.end("true");
@@ -160,10 +160,43 @@ module.exports = (app, fs, path, crypto, async, getIP, getTime, mysql_query) => 
                 }
             // filtering rules
 
+            var scomm = "";
+
+            // filtering bases
+            if (base != undefined) {
+                if (base != "all") {
+                    if (base.id) {
+                        scomm += ' AND id="'+base.id+'"'
+                    }
+                    if (base.userid) {
+                        scomm += ' AND userid="'+base.userid+'"'
+                    }
+                    if (base.status) {
+                        scomm += ' AND status="'+base.status+'"'
+                    }
+                    if (base.designerid) {
+                        scomm += ' AND designerid="'+base.designerid+'"'
+                    }
+                    if (base.date) {
+                        scomm += ' AND date="'+base.date+'"'
+                    }
+                    if (base.time) {
+                        scomm += ' AND time="'+base.time+'"'
+                    }
+                    if (base.note) {
+                        scomm += ' AND note="'+base.note+'"'
+                    }
+                }
+            }
+            
+
+            // filtering bases
+
             ucomm = ucomm.replace(",", "");
+            scomm = scomm.replace(" AND", " WHERE");
 
             const cbase = Object.keys(base)[0];
-            mysql_query("UPDATE reserv SET" + ucomm + " WHERE " + cbase + "='" + base[cbase] + "'")
+            mysql_query("UPDATE reserv SET" + ucomm + scomm)
             .then((res_sql) => {
                 // console.log(res_sql);
                 res_end(res, 200, undefined, undefined, res_sql);
@@ -231,9 +264,76 @@ module.exports = (app, fs, path, crypto, async, getIP, getTime, mysql_query) => 
 
         // delete
 
+        app.delete('/reserv', (req, res) => {
+            const rule = req.body.rule; // format: String or JSON
+
+            var scomm = "";
+
+            // filtering rules
+            if (rule != undefined) {
+                if (rule != "all") {
+                    if (rule.id) {
+                        scomm += ' AND id="'+rule.id+'"'
+                    }
+                    if (rule.userid) {
+                        scomm += ' AND userid="'+rule.userid+'"'
+                    }
+                    if (rule.status) {
+                        scomm += ' AND status="'+rule.status+'"'
+                    }
+                    if (rule.designerid) {
+                        scomm += ' AND designerid="'+rule.designerid+'"'
+                    }
+                    if (rule.date) {
+                        scomm += ' AND date="'+rule.date+'"'
+                    }
+                    if (rule.time) {
+                        scomm += ' AND time="'+rule.time+'"'
+                    }
+                    if (rule.note) {
+                        scomm += ' AND note="'+rule.note+'"'
+                    }
+                }
+                
+
+                // filtering rules
+
+                scomm = scomm.replace(" AND", " WHERE");
+
+                // console.log(scomm);
+
+                mysql_query("DELETE FROM reserv" + scomm)
+                .then((res_sql) => {
+                    // console.log(res_sql);
+                    res_end(res, 200, undefined, undefined, res_sql);
+                })
+                .catch((err) => {
+                    // console.log(err);
+                    res_end(res, 403, err, "Delete from DB", undefined);
+                })
+            } else {
+                res_end(res, 400, "Cannot find key 'rule'", "Filtering Convertion", undefined);
+            }
+        })
+
 
 
     // photo upload function
+
+        const upload = multer({
+            dest: '/photo/temp'
+        });
+
+        // upload
+        app.post('/photo', upload.single(), (req, res) => {
+            console.log(req.file);
+
+            res.end();
+        })
+
+        // download
+
+        // delete
 
     
     // user function

@@ -9,6 +9,7 @@ const crypto = require("crypto");
 const getIP = require("ipware")().get_ip;
 const http = require("http");
 const async = require("async");
+const multer = require("multer");
 
 const app = express();
 
@@ -131,4 +132,4 @@ mysql_query("show tables")
 
 
 // router
-const router = require("./router") (app, fs, path, crypto, async, getIP, getTime, mysql_query);
+const router = require("./router") (app, fs, path, crypto, multer, async, getIP, getTime, mysql_query);
