@@ -572,57 +572,46 @@ module.exports = (app, fs, path, crypto, multer, async, getIP, utf8, iconv, mime
             var ucomm = "";
 
             // filtering rules
-                if (cobj.id) {
-                    ucomm += ', id="'+cobj.id+'"'
+
+                var scomm = "";
+
+                // filtering bases
+                if (base != undefined && cobj != undefined) {
+                        if (cobj.userid) {
+                            ucomm += ', id="'+cobj.userid+'"'
+                        }
+                        if (cobj.name) {
+                            ucomm += ', userid="'+cobj.name+'"'
+                        }
+                        if (cobj.type) {
+                            ucomm += ', status="'+cobj.type+'"'
+                        }
+                        if (cobj.pn) {
+                            ucomm += ', designerid="'+cobj.pn+'"'
+                        }
+                        if (cobj.email) {
+                            ucomm += ', date="'+cobj.email+'"'
+                        }
+                    if (base != "all") {
+                        if (base.userid) {
+                            scomm += ', id="'+base.userid+'"'
+                        }
+                        if (base.name) {
+                            scomm += ', userid="'+base.name+'"'
+                        }
+                        if (base.type) {
+                            scomm += ', status="'+base.type+'"'
+                        }
+                        if (base.pn) {
+                            scomm += ', designerid="'+base.pn+'"'
+                        }
+                        if (base.email) {
+                            scomm += ', date="'+base.email+'"'
+                        }
+                    }
                 }
-                if (cobj.userid) {
-                    ucomm += ', userid="'+cobj.userid+'"'
-                }
-                if (cobj.status) {
-                    ucomm += ', status="'+cobj.status+'"'
-                }
-                if (cobj.designerid) {
-                    ucomm += ', designerid="'+cobj.designerid+'"'
-                }
-                if (cobj.date) {
-                    ucomm += ', date="'+cobj.date+'"'
-                }
-                if (cobj.time) {
-                    ucomm += ', time="'+cobj.time+'"'
-                }
-                if (cobj.note) {
-                    ucomm += ', note="'+cobj.note+'"'
-                }
+            
             // filtering rules
-
-            var scomm = "";
-
-            // filtering bases
-            if (base != undefined) {
-                if (base != "all") {
-                    if (base.id) {
-                        scomm += ' AND id="'+base.id+'"'
-                    }
-                    if (base.userid) {
-                        scomm += ' AND userid="'+base.userid+'"'
-                    }
-                    if (base.status) {
-                        scomm += ' AND status="'+base.status+'"'
-                    }
-                    if (base.designerid) {
-                        scomm += ' AND designerid="'+base.designerid+'"'
-                    }
-                    if (base.date) {
-                        scomm += ' AND date="'+base.date+'"'
-                    }
-                    if (base.time) {
-                        scomm += ' AND time="'+base.time+'"'
-                    }
-                    if (base.note) {
-                        scomm += ' AND note="'+base.note+'"'
-                    }
-                }
-            }
             
 
             // filtering bases

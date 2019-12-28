@@ -106,7 +106,7 @@ app.use(session({
 // mysql access command
 
 const conn_mysql = mysql.createConnection({
-    host: "175.116.45.38",
+    host: "222.117.33.139",
     user: "cdeday",
     password: "cdeday_test+",
     port: 3306,
