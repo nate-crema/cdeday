@@ -70,6 +70,8 @@ function getTime() {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 
+// app.use(express.static(__dirname));
+
 // log accessed ip
 
 app.use((req, res, next) => {
@@ -137,9 +139,14 @@ mysql_query("show tables")
 
 // random string
 
-function makeid(length) {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+function makeid(length, type) {
+    let characters;
+    if (type == "num") {
+        characters = '0123456789';
+    } else {
+        characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    }
+    var result = '';
     var charactersLength = characters.length;
     for ( var i = 0; i < length; i++ ) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
