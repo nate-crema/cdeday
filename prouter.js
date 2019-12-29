@@ -93,333 +93,437 @@ function makeid(length, type) {
 }
 
 
-// pay function
+// Today & Time Analytics Algorithm
 
-        // logger
-
-function payment_logger (paytype, paymethod, methodinfo, date, time, state, ip, interest, Pplan, prodid, pid) {
-    // request example
-
-    /*
-
-    log_info: {
-        paytype: 0/1/2 // 0: test, 1: onetime, 2: subscribe
-        paymethod: 0/1 // 0: card, 1: vbank
-        methodinfo: {
-            // if (paymehtod == 0)
-
-            cnum: [Full, non-encrypted card number]
-            expiry: [YYYY-DD]
-
-            // if (paymethod == 1) 
-
-            accnum_c: [customer account number]
-            accnum_v: [vbank account number]
-            bcode_c: [customer account bankcode]
-            bcode_v: [vbank account bankcode]
-            
-        }
-
-        date: [YYYYDDMM]
-        time: [HH:MM:SS]
-        state: 0/1/2/3/4/5 // 0: payment requested, 1: payment progressing (only for card), 2: payment complete, 3: vbank error (only for vbank), 4: card error (only for card) (include bank managing time), 5: payment canceled
-        ip: [___.___.___.___]
-        interest: 1~12 (interest only be settled bigger than '1' if paying price is more than 50,000WON (KRW))
-
+function getTime() {
+    var date = new Date().getDate();
+    if (date < 10) {
+        date = '0' + date
     }
 
-    */
+    var month = new Date().getMonth()+1;
+    if (month < 10) {
+        month = '0' + month
+    }
 
-    // request example
+    var hour = new Date().getHours();
+    if (hour < 10) {
+        hour = '0' + hour
+    }
+
+    var minute = new Date().getMinutes();
+    if (minute < 10) {
+        minute = '0' + minute
+    }
+
+    var second = new Date().getSeconds();
+    if (second < 10) {
+        second = '0' + second
+    }
+
+
+    return '' + new Date().getFullYear() + month + date + "-" + hour + ":" + minute + ":" + second;
 }
 
 
+// pay function
 
-        // request
-        app.post('/payment', (req, res) => {
-            const type = req.body.paytype; // 0: test, 1: onetime, 2: subscribe
+    // pay logger
 
-            const card_number = req.body.card_num; // 16-digit card number
-            const expiry = req.body.expiry; // YYYY-MM
-            const pwd_2digit = req.body.pwd; // first 2-digit card password
-            const amount = req.body.amount; // paying amount (Base: Korean WON)
-            const userid = req.body.userid; // format: String
+    function logger(userid, paymethod, methodinfo, paytype, price, ip, currency, prod_id, paym_id, note) {
+        const fullTime = getTime();
+        const date = fullTime.split("-")[0];
+        const time = fullTime.split("-")[1];
+        if (paymethod == "card") {
+            // payment id rules check
+            const paymid_dist = '' + paym_id.split("")[0] + paym_id.split("")[1] + paym_id.split("")[2];
+            if (paymid_dist == "c21") {
+                const command = "INSERT INTO payCard (userid, date, time, cardnum, expiry, paytype, price, paydue, ip, currency, prod_id, paym_id, status) VALUES ('" + userid + "', '" + date + "', '" + time + "', '" + methodinfo.cardnum + "', '" + methodinfo.expiry + "', '" + paytype + "', " + price + ", '" + methodinfo.paydue + "', '" + ip + "', '" + currency + "', '" +prod_id + "', '" +paym_id + "', " + 0 + ")";
+                mysql_query(command)
+                .then((res_sql) => {
+                    console.log(res_sql);
+                    return {
+                        code: 200,
+                        cont: "Write log complete:" + paym_id
+                    };
+                })
+                .catch((e) => {
+                    return {
+                        code: 400,
+                        cont: "ERR: unidentified error \n" + e
+                    }
+                });
+            } else {
+                return {
+                    code: 400,
+                    cont: "ERR: Invalid payment id: " + paym_id
+                };
+            }
 
-            // payment functions
+        } else if (paymethod == "account") {
+            // payment id rules check
+            const paymid_dist = '' + paym_id.split("")[0] + paym_id.split("")[1] + paym_id.split("")[2];
+            if (paymid_dist == "v24") {
+                const command = "INSERT INTO payAcc (userid, date, time, bank, depositor, accnum, due_acc, paytype, price, paydue, ip, currency, prod_id, paym_id, status) VALUES ('" + userid + "', '" + date + "', '" + time + "', '" + methodinfo.bank + "', '" + methodinfo.depositor + "', '" + methodinfo.accnum + "', '" + methodinfo.due_acc + "', '" + paytype + "', " + price + ", '" + 0 + "', '" + ip + "', '" + currency + "', '" +prod_id + "', '" +paym_id + "', " + 0 + ")";
+                mysql_query(command)
+                .then((res_sql) => {
+                    console.log(res_sql);
+                    return {
+                        code: 200,
+                        cont: "Write log complete:" + paym_id
+                    };
+                })
+                .catch((e) => {
+                    return {
+                        code: 400,
+                        cont: "ERR: unidentified error \n" + e
+                    }
+                });
+            } else {
+                return {
+                    code: 400,
+                    cont: "ERR: Invalid payment id: " + paym_id
+                };
+            }
+        } else {
+            return {
+                code: 400,
+                cont: "ERR: Invalid parameter: paymethod"
+            };
+        }
+            
+    }
+
+    // // pay serveral times calculator
+    // function date_check(basey, basem, based, addsub) {
+    //     let date = new Date(basey, basem-1, based, 20);
+    //     date.setDate(date.getDate() + addsub);
+    //     return date.toLocaleString();
+    // }
+
+    // function regularpayMaker(duration) {
+    //     const fullDate = getTime().split("-")[0];
+    //     const basedate = new Date(fullDate.substr(0, 4), fullDate.substr(4, 2), fullDate.substr(6, 2), 20);
+    //     let array = [];
+    //     for (var i = 0; i < 12; i++) {
+    //         basedate.setDate(basedate.getDate() + duration);
+    //         array.push(basedate);
+    //     }
+    //     // console.log(array);
+    //     return array;
+    // }
+
+    // app.post('/', (req, res) => {
+    //     const res_pwd = regularpayMaker(30);
+    //     res.end(res_pwd);
+    // })
+
+
+
+    // payment functions
+
+    // 0: test
+    function payTest(muid, cuid, token, userinfo, res) {
+        // pay real. refund money in iamport console
+
+        console.log("=====test pay=====");
+        console.log("Token: " + token);
+        console.log(expiry);
+        
+        var birth = userinfo.birth;
+        
+        while(true) {
+            var before = birth;
+            birth = birth.replace(".","");
+            if (birth == before) {
+                if ('' + birth.split("")[0] + birth.split("")[1] == '19') {
+                    birth = birth.replace("19","");
+                } else {
+                    birth = birth.replace("20","");
+                }
+                break;
+            }
+        }
+
+        console.log(birth);
+        
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": token
+        }
+
+        const data = {
+            merchant_uid: muid,
+            amount,
+            card_number,
+            expiry,
+            birth,
+            pwd_2digit,
+            customer_uid: cuid,
+            name: userinfo.name
+            // pg: "[PG]"
+        }
+
+        axios.post('https://api.iamport.kr/subscribe/payments/onetime', data, {headers})
+            .then((res_pay) => {
+                console.log("=====pay requested=====");
+                // console.log(res_pay.data);
+                // res.json(res_pay.data);
+                if (res_pay.data.response && res_pay.data.response.status == "paid") {
+                    console.log("=====paid!=====");
+                    res_end(res, 200, undefined, undefined, {
+                        muid,
+                        cuid,
+                        amount,
+                        status: true,
+                        userid
+                    });
+                } else if (res_pay.data.response && res_pay.data.response.status == "failed" && res_pay.data.response.fail_reason.includes("사용한도초과")) {
+                    res_end(res, 403, "잔액부족/한도초과", "payOne", undefined,{
+                        muid,
+                        cuid,
+                        amount,
+                        status: true,
+                        userid
+                    });
+                } else {
+                    if (res_pay.data.response && res_pay.data.response.fail_reason) {
+                        res_end(res, 403, res_pay.data.response.fail_reason, "payOne", undefined,{
+                            muid,
+                            cuid,
+                            amount,
+                            status: true,
+                            userid
+                        });
+                    } else {
+                        res_end(res, 403, res_pay.data, "payOne", undefined,{
+                            muid,
+                            cuid,
+                            amount,
+                            status: true,
+                            userid
+                        });
+                    }
+                }
+            })
+            .catch((e) => {
+                console.log(e);
+                // res.json(e);
+                res_end(res, 200, e, "payOne", undefined,{
+                    muid,
+                    cuid,
+                    amount,
+                    status: true,
+                    userid
+                });
+            })
+    }
+
+    // 1: onetime
+    function payOne(muid, cuid, token, userinfo, res, pg) {
+        // pay real
+
+        if (server_mode == "development") {
+            res_end(res, 501, "ERR: forbidden", "payOne", undefined, "Service Not Opened");
+        } else if (server_mode == "service") {
+            console.log("=====payOne=====");
+            // console.log("Token: " + token);
+            // console.log(expiry);
+            // console.log(userinfo.birth);
+            
+            var birth = userinfo.birth;
+            
+            while(true) {
+                var before = birth;
+                birth = birth.replace(".","");
+                if (birth == before) {
+                    if ('' + birth.split("")[0] + birth.split("")[1] == '19') {
+                        birth = birth.replace("19","");
+                    } else {
+                        birth = birth.replace("20","");
+                    }
+                    break;
+                }
+            }
+            
+            const headers = {
+                "Content-Type": "application/json",
+                "Authorization": token
+            }
+
+            const data = {
+                merchant_uid: muid,
+                amount,
+                card_number,
+                expiry,
+                birth,
+                pwd_2digit,
+                customer_uid: cuid,
+                name: userinfo.name,
+                pg
+            }
+
+            axios.post('https://api.iamport.kr/subscribe/payments/onetime', data, {headers})
+            .then((res_pay) => {
+                console.log("=====pay requested=====");
+                // console.log(res_pay.data);
+                // res.json(res_pay.data);
+                if (res_pay.data.response.status == "paid") {
+                    res_end(res, 200, undefined, undefined, {
+                        muid,
+                        cuid,
+                        amount,
+                        status: true,
+                        userid
+                    });
+                } else if (res_pay.data.response.status == "failed" && res_pay.data.response.fail_reason.includes("사용한도초과")) {
+                    res_end(res, 403, "잔액부족/한도초과", "payOne", undefined,{
+                        muid,
+                        cuid,
+                        amount,
+                        status: true,
+                        userid
+                    });
+                } else {
+                    res_end(res, 403, res_pay.data.response.fail_reason, "payOne", undefined,{
+                        muid,
+                        cuid,
+                        amount,
+                        status: true,
+                        userid
+                    });
+                }
+            })
+            .catch((e) => {
+                // console.log(e);
+                // res.json(e);
+                res_end(res, 200, e, "payOne", undefined,{
+                    muid,
+                    cuid,
+                    amount,
+                    status: true,
+                    userid
+                });
+            })
+        }
+    }
+
+    // 2: subscribe
+    function paySubscribe(muid, cuid, token, userinfo, res, pg) {
+        // pay real
+        // subscribe will be setted 12 times maximum
+
+        if (server_mode == "development") {
+            res_end(res, 501, "ERR: forbidden", "payOne", undefined, "Service Not Opened");
+        } else if (server_mode == "service") {
+            console.log("=====payOne=====");
+            // console.log("Token: " + token);
+            // console.log(expiry);
+            // console.log(userinfo.birth);
+            
+            var birth = userinfo.birth;
+            
+            while(true) {
+                var before = birth;
+                birth = birth.replace(".","");
+                if (birth == before) {
+                    if ('' + birth.split("")[0] + birth.split("")[1] == '19') {
+                        birth = birth.replace("19","");
+                    } else {
+                        birth = birth.replace("20","");
+                    }
+                    break;
+                }
+            }
+            
+            const headers = {
+                "Content-Type": "application/json",
+                "Authorization": token
+            }
+
+            const data = {
+                // merchant_uid: muid,
+                // amount,
+                // card_number,
+                // expiry,
+                // birth,
+                // pwd_2digit,
+                // customer_uid: cuid,
+                // name: userinfo.name,
+                // pg
+                customer_uid: cuid,
+
+            }
+
+            axios.post('https://api.iamport.kr/subscribe/payments/schedules', data, {headers})
+            .then((res_pay) => {
+                console.log("=====pay requested=====");
+                // console.log(res_pay.data);
+                // res.json(res_pay.data);
+                if (res_pay.data.response.status == "paid") {
+                    res_end(res, 200, undefined, undefined, {
+                        muid,
+                        cuid,
+                        amount,
+                        status: true,
+                        userid
+                    });
+                } else if (res_pay.data.response.status == "failed" && res_pay.data.response.fail_reason.includes("사용한도초과")) {
+                    res_end(res, 403, "잔액부족/한도초과", "payOne", undefined,{
+                        muid,
+                        cuid,
+                        amount,
+                        status: true,
+                        userid
+                    });
+                } else {
+                    res_end(res, 403, res_pay.data.response.fail_reason, "payOne", undefined,{
+                        muid,
+                        cuid,
+                        amount,
+                        status: true,
+                        userid
+                    });
+                }
+            })
+            .catch((e) => {
+                // console.log(e);
+                // res.json(e);
+                res_end(res, 200, e, "payOne", undefined,{
+                    muid,
+                    cuid,
+                    amount,
+                    status: true,
+                    userid
+                });
+            })
+        }
+    }
+
+
+
+    app.post('/card', (req, res) => {
+        const type = req.body.paytype; // 0: test, 1: onetime, 2: subscribe
+
+        const card_number = req.body.card_num; // 16-digit card number
+        const expiry = req.body.expiry; // YYYY-MM
+        const pwd_2digit = req.body.pwd; // first 2-digit card password
+        const amount = req.body.amount; // paying amount (Base: Korean WON)
+        const userid = req.body.userid; // format: String
+
+        const pay_duration = req.body.payDur; // format: YYYY-MM-DD
+
+        // new Date('2012.08.10').getTime() / 1000
+
+
+        // payment function
 
             
-            function payTest(muid, cuid, token, userinfo, res) {
-                // pay real, and refund after a minute
-
-                console.log("=====test pay=====");
-                console.log("Token: " + token);
-                console.log(expiry);
-                
-                var birth = userinfo.birth;
-                
-                while(true) {
-                    var before = birth;
-                    birth = birth.replace(".","");
-                    if (birth == before) {
-                        birth = birth.replace("19","");
-                        break;
-                    }
-                }
-
-                console.log(birth);
-                
-                const headers = {
-                    "Content-Type": "application/json",
-                    "Authorization": token
-                }
-
-                const data = {
-                    merchant_uid: muid,
-                    amount,
-                    card_number,
-                    expiry,
-                    birth,
-                    pwd_2digit,
-                    customer_uid: cuid,
-                    name: userinfo.name
-                    // pg: "[PG]"
-                }
-
-                axios.post('https://api.iamport.kr/subscribe/payments/onetime', data, {headers})
-                    .then((res_pay) => {
-                        console.log("=====pay requested=====");
-                        // console.log(res_pay.data);
-                        // res.json(res_pay.data);
-                        if (res_pay.data.response && res_pay.data.response.status == "paid") {
-                            console.log("=====paid!=====");
-                            res_end(res, 200, undefined, undefined, {
-                                muid,
-                                cuid,
-                                amount,
-                                status: true,
-                                userid
-                            });
-                        } else if (res_pay.data.response && res_pay.data.response.status == "failed" && res_pay.data.response.fail_reason.includes("사용한도초과")) {
-                            res_end(res, 403, "잔액부족/한도초과", "payOne", undefined,{
-                                muid,
-                                cuid,
-                                amount,
-                                status: true,
-                                userid
-                            });
-                        } else {
-                            if (res_pay.data.response && res_pay.data.response.fail_reason) {
-                                res_end(res, 403, res_pay.data.response.fail_reason, "payOne", undefined,{
-                                    muid,
-                                    cuid,
-                                    amount,
-                                    status: true,
-                                    userid
-                                });
-                            } else {
-                                res_end(res, 403, res_pay.data, "payOne", undefined,{
-                                    muid,
-                                    cuid,
-                                    amount,
-                                    status: true,
-                                    userid
-                                });
-                            }
-                        }
-                    })
-                    .catch((e) => {
-                        console.log(e);
-                        // res.json(e);
-                        res_end(res, 200, e, "payOne", undefined,{
-                            muid,
-                            cuid,
-                            amount,
-                            status: true,
-                            userid
-                        });
-                    })
-            }
-
-            function payOne(muid, cuid, token, userinfo, res, pg) {
-                // pay real
-
-                if (server_mode == "development") {
-                    res_end(res, 501, "ERR: forbidden", "payOne", undefined, "Service Not Opened");
-                } else if (server_mode == "service") {
-                    console.log("=====payOne=====");
-                    // console.log("Token: " + token);
-                    // console.log(expiry);
-                    // console.log(userinfo.birth);
-                    
-                    var birth = userinfo.birth;
-                    
-                    while(true) {
-                        var before = birth;
-                        birth = birth.replace(".","");
-                        if (birth == before) {
-                            break;
-                        }
-                    }
-                    
-                    const headers = {
-                        "Content-Type": "application/json",
-                        "Authorization": token
-                    }
-
-                    const data = {
-                        merchant_uid: muid,
-                        amount,
-                        card_number,
-                        expiry,
-                        birth,
-                        pwd_2digit,
-                        customer_uid: cuid,
-                        name: userinfo.name,
-                        pg
-                    }
-
-                    axios.post('https://api.iamport.kr/subscribe/payments/onetime', data, {headers})
-                    .then((res_pay) => {
-                        console.log("=====pay requested=====");
-                        // console.log(res_pay.data);
-                        // res.json(res_pay.data);
-                        if (res_pay.data.response.status == "paid") {
-                            res_end(res, 200, undefined, undefined, {
-                                muid,
-                                cuid,
-                                amount,
-                                status: true,
-                                userid
-                            });
-                        } else if (res_pay.data.response.status == "failed" && res_pay.data.response.fail_reason.includes("사용한도초과")) {
-                            res_end(res, 403, "잔액부족/한도초과", "payOne", undefined,{
-                                muid,
-                                cuid,
-                                amount,
-                                status: true,
-                                userid
-                            });
-                        } else {
-                            res_end(res, 403, res_pay.data.response.fail_reason, "payOne", undefined,{
-                                muid,
-                                cuid,
-                                amount,
-                                status: true,
-                                userid
-                            });
-                        }
-                    })
-                    .catch((e) => {
-                        // console.log(e);
-                        // res.json(e);
-                        res_end(res, 200, e, "payOne", undefined,{
-                            muid,
-                            cuid,
-                            amount,
-                            status: true,
-                            userid
-                        });
-                    })
-                }
-            }
+            
+    })
 
 
 
-            // payment functions
-
-            async.waterfall([
-                function(callback) {
-                    // get paying request information
-                    fs.readFile(__dirname + "/paymentRInfo.json", {encoding: "UTF-8"}, (err, data) => {
-                        if (err) res_end(res, 400, err, "Read paymentRInfo", undefined);
-                        else callback(null, JSON.parse(data));
-                        // res.end();
-                    })
-                },
-                function(paymentRInfo, callback) {
-                    // get user information
-                    mysql_query("SELECT * FROM user WHERE userid='" + userid + "'")
-                    .then((res_sql) => {
-                        // console.log(res_sql);
-                        if (res_sql.length == 0) res_end(res, 404, "ERR: Cannot find user '" + userid + "'", "check userid", undefined);
-                        else callback(null, paymentRInfo, res_sql[0]);
-                    })
-                },
-                function(paymentRInfo, userinfo, callback) {
-                    // console.log(".");
-
-                    // get AccessToken
-
-                    axios.post('https://api.iamport.kr/users/getToken', {
-                        imp_key: paymentRInfo.apiKey,
-                        imp_secret: paymentRInfo.apiSecret
-                    })
-                    .then((res) => {
-                        // console.log(".");
-                        const data = res.data;
-                        if (data.response.access_token) {
-                            // console.log(".");
-                            callback(null, data.response.access_token, userinfo);
-                        } else {
-                            res_end(res, 400, "ERR: Authorification Failed in Internal Server. Please Contact Server Manager", "getAccessToken", undefined, res);
-                        }
-                    })
-                    .catch((e) => {
-                        if (e.response && e.response.status == 401) {
-                            res_end(res, 401, "ERR: Authorification Failed in Official Payment API Server.", "getAccessToken", undefined);
-                        }
-                    })
-                },
-                function(token, userinfo, callback) {
-
-                    console.log(".");
-
-                    // generate customer uid
-
-                    const fullTime = getTime();
-                    console.log(fullTime);
-                    const date = fullTime.split("-")[0];
-                    const time = fullTime.split("-")[1];
-                    const timeadd = (time.split(":")[0])*1 + (time.split(":")[1])*1 + (time.split(":")[2])*1;
-                    console.log(timeadd);
-
-                    const cuid_back = (userinfo._id)*1 + (userinfo.pn)*1 + (userinfo.birth.split(".")[1])*1 + (userinfo.birth.split(".")[0])*1;
-                    console.log(userinfo);
-                    console.log(cuid_back);
-                    const customer_uid = '' + userid + cuid_back;
-                    console.log(customer_uid);
-
-
-                    // generate merchant uid
-
-                    const merchant_uid = date + "_" + userid + timeadd + makeid(5);
-
-                    console.log(customer_uid);
-                    console.log(merchant_uid);
-
-
-                    callback(null, merchant_uid, customer_uid, token, userinfo);
-                },
-                function(muid, cuid, token, userinfo, callback) {
-
-                    console.log("before request");
-
-                    // distinguish paytype
-                    if (type == "0") {
-                        // test payment
-                        payTest(muid, cuid, token, userinfo, res);
-                    } else if (type == "1") {
-                        payOne(muid, cuid, token, userinfo, res, req.body.pg);
-                    } else if (type == "2") {
-                        paySchedule(muid, cuid, token, userinfo, res);
-                    }
-                }
-            ])
-        })
-
-        // cancel
-
-        // find (load logs)
 
 
 
