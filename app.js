@@ -3,17 +3,9 @@ const session = require("express-session");
 const bodyParser = require("body-parser");
 const path = require("path");
 const fs = require("fs");
-const mysql = require("mysql");
 const cors = require("cors");
-const crypto = require("crypto");
 const getIP = require("ipware")().get_ip;
 const http = require("http");
-const async = require("async");
-const multer = require("multer");
-const utf8 = require("utf8");
-const iconv = require("iconv-lite");
-const mime = require("mime");
-const mimeTypes = require("mime-types");
 
 const app = express();
 
@@ -105,56 +97,13 @@ app.use(session({
 }))
 
 
-// mysql access command
-
-const conn_mysql = mysql.createConnection({
-    host: "222.117.33.139",
-    user: "cdeday",
-    password: "cdeday_test+",
-    port: 3306,
-    database: "cdeday"
-});
-
-conn_mysql.connect();
-
-function mysql_query(q_comm) {
-    return new Promise((resolve, reject) => {
-        conn_mysql.query(q_comm, (err, rows, fields) => {
-            if (err) reject("Query ERR: " + err);
-            else resolve(rows);
-        })
-    })
-}
-
-mysql_query("show tables")
-.then((res) => {
-    if (res.length != 0) {
-        console.log("Connected to Mysql DB. Total table number is " + res.length);
-    }
-})
-.catch((err) => {
-    console.log(err);
-})
-
-
 // random string
-
-function makeid(length, type) {
-    let characters;
-    if (type == "num") {
-        characters = '0123456789';
-    } else {
-        characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    }
-    var result = '';
-    var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-}
 
 
 
 // router
-const router = require("./router") (app, fs, path, crypto, multer, async, getIP, utf8, iconv, mime, mimeTypes, getTime, makeid, mysql_query);
+
+app.use('/', require('./router'));
+app.use('/payment', require('./prouter'));
+// app.use('/payment', require("./prouter") (app, fs, path, crypto, multer, async, getIP, utf8, iconv, mime, axios, mimeTypes, getTime, makeid, mysql_query));
+
